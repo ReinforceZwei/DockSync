@@ -1,0 +1,133 @@
+# DockSync Configuration Example
+# Copy this file to /config/config.yml and customize for your needs
+
+# Global Apprise notification URLs (optional)
+# These will be used for all tasks unless overridden
+# See https://github.com/caronc/apprise for URL format
+apprise:
+  - "discord://webhook_id/webhook_token"
+  - "telegram://bot_token/chat_id"
+  # - "slack://token_a/token_b/token_c"
+  # - "email://user:pass@smtp.gmail.com"
+  # - "ntfy://ntfy.sh/my_topic"
+
+# Global notification settings (optional)
+# Tasks can override these settings individually
+notification:
+  # When to send notifications
+  # Options: "all" (default), "failure", "never"
+  notify_on: "all"
+  
+  # Whether to include command output in notifications
+  # Options: "all" (default), "failure", "never"
+  # - "all": Include output in both success and failure notifications
+  # - "failure": Only include output in failure notifications
+  # - "never": Never include output (only show task status)
+  include_output: "all"
+
+# Task definitions
+tasks:
+  # Example 1: Simple rclone backup
+  - name: "daily-backup"
+    # Cron expression: Daily at 2:00 AM
+    # Format: minute hour day month day_of_week
+    cron: "0 2 * * *"
+    
+    # Notification settings
+    # Options: "all" (default), "failure", "never"
+    notify_on: "all"
+    
+    # Failure handling strategy
+    # Options: "stop" (default), "continue", "retry"
+    on_failure: "stop"
+    
+    # Steps to execute
+    steps:
+      - command: "rclone sync /data/backup remote:backup --progress"
+      - command: "echo 'Backup completed'"
+
+  # Example 2: Multi-step task with custom script
+  - name: "archive-and-upload"
+    cron: "0 3 * * 0"  # Weekly on Sunday at 3:00 AM
+    notify_on: "all"
+    on_failure: "continue"
+    
+    steps:
+      - command: "tar -czf /data/archive-$(date +%Y%m%d).tar.gz /data/source"
+      - command: "rclone copy /data/archive-*.tar.gz remote:archives"
+      - command: "/script/cleanup-old-archives.sh"
+
+  # Example 3: Task with retry on failure
+  - name: "sync-photos"
+    cron: "*/30 * * * *"  # Every 30 minutes
+    notify_on: "failure"
+    on_failure: "retry"
+    retry_count: 3
+    
+    steps:
+      - command: "rclone sync /data/photos remote:photos --max-age 24h"
+
+  # Example 4: Task with custom notification URLs (override global)
+  - name: "critical-backup"
+    cron: "0 */6 * * *"  # Every 6 hours
+    notify_on: "all"
+    on_failure: "stop"
+    
+    # Task-specific Apprise URLs (overrides global)
+    apprise:
+      - "telegram://different_bot_token/different_chat_id"
+      - "email://admin@example.com"
+    
+    steps:
+      - command: "rclone sync /data/critical remote:critical-backup"
+  
+  # Example 4b: Task that overrides global notification settings
+  - name: "quiet-task"
+    cron: "*/5 * * * *"  # Every 5 minutes
+    notify_on: "failure"  # Override global: only notify on failure
+    include_output: "never"  # Override global: never include output
+    on_failure: "retry"
+    retry_count: 2
+    
+    steps:
+      - command: "rclone sync /data/temp remote:temp --max-age 1h"
+
+  # Example 5: Custom script execution
+  - name: "custom-maintenance"
+    cron: "0 4 * * 1"  # Monday at 4:00 AM
+    notify_on: "failure"
+    on_failure: "continue"
+    
+    steps:
+      - command: "/script/database-cleanup.sh"
+      - command: "/script/log-rotation.sh"
+      - command: "rclone cleanup remote:backup"
+
+  # Example 6: Multiple rclone operations
+  - name: "multi-remote-sync"
+    cron: "0 1 * * *"  # Daily at 1:00 AM
+    notify_on: "all"
+    on_failure: "stop"
+    
+    steps:
+      - command: "rclone sync /data/docs remote1:documents"
+      - command: "rclone sync /data/docs remote2:documents"
+      - command: "rclone sync /data/docs remote3:documents"
+
+# Cron expression quick reference:
+# ┌───────────── minute (0 - 59)
+# │ ┌───────────── hour (0 - 23)
+# │ │ ┌───────────── day of month (1 - 31)
+# │ │ │ ┌───────────── month (1 - 12)
+# │ │ │ │ ┌───────────── day of week (0 - 6) (Sunday to Saturday)
+# │ │ │ │ │
+# * * * * *
+#
+# Examples:
+# "0 0 * * *"       - Daily at midnight
+# "0 */6 * * *"     - Every 6 hours
+# "*/15 * * * *"    - Every 15 minutes
+# "0 2 * * 0"       - Weekly on Sunday at 2 AM
+# "0 0 1 * *"       - Monthly on the 1st at midnight
+# "0 9 * * 1-5"     - Weekdays at 9 AM
+

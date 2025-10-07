@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  docksync:
+    image: ghcr.io/reinforcezwei/docksync:latest
+    container_name: docksync
+    restart: unless-stopped
+    
+    # Environment variables
+    environment:
+      - TZ=America/New_York
+      # Optional: Override config file location
+      # - DOCKSYNC_CONFIG=/config/custom-config.yml
+    
+    # Volume mounts
+    volumes:
+      # Configuration file
+      - ./config:/config
+      
+      # Custom scripts directory
+      - ./scripts:/script
+      
+      # Data directory for rclone operations
+      - ./data:/data
+      
+      # Optional: Mount rclone config if not in /config
+      # - ./rclone.conf:/root/.config/rclone/rclone.conf:ro
+    
+    # Optional: Network mode (uncomment if needed)
+    # network_mode: host
+    
+    # Optional: Resource limits
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '2'
+    #       memory: 1G
+    #     reservations:
+    #       cpus: '0.5'
+    #       memory: 256M
+

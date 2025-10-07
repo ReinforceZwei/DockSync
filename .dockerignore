@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+.github
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info
+venv/
+env/
+
+# Documentation
+*.md
+!README.md
+
+# Docker
+docker-compose.yml
+.dockerignore
+Dockerfile
+
+# Config examples and local data
+config/
+scripts/
+data/
+
+# IDE
+.vscode
+.idea
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# CI/CD
+.github
+
+# Plan files
+*.plan.md
+
