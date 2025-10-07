@@ -1,10 +1,8 @@
 # DockSync - Rclone Scheduler with Notifications
-FROM alpine:3.19
+FROM python:3.12-alpine
 
 # Install system dependencies
 RUN apk add --no-cache \
-    python3 \
-    py3-pip \
     bash \
     curl \
     tar \
@@ -40,7 +38,7 @@ WORKDIR /app
 
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application source code
 COPY src/ /app/
@@ -52,5 +50,5 @@ RUN mkdir -p /config /script /data
 ENV PYTHONUNBUFFERED=1
 
 # Default command
-CMD ["python3", "/app/scheduler.py"]
+CMD ["python", "/app/scheduler.py"]
 
