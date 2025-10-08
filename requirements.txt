@@ -1,5 +1,6 @@
 APScheduler==3.10.4
-PyYAML==6.0.1
 apprise==1.7.4
 croniter==2.0.1
+pydantic==2.10.4
+pydantic-yaml==1.4.0
 
