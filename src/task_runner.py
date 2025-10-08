@@ -3,8 +3,9 @@
 import subprocess
 import logging
 import time
-from typing import Dict, List, Any, Tuple
+from typing import Dict, Tuple
 from notifier import Notifier
+from models import TaskModel
 
 logger = logging.getLogger(__name__)
 
@@ -12,31 +13,31 @@ logger = logging.getLogger(__name__)
 class TaskRunner:
     """Execute tasks with multi-step support and failure handling."""
 
-    def __init__(self, task_config: Dict[str, Any], global_notifier: Notifier, 
-                 global_notification_config: Dict[str, Any] = None):
+    def __init__(self, task_config: TaskModel, global_notifier: Notifier, 
+                 global_notification_config: Dict[str, str] | None = None):
         """Initialize task runner.
         
         Args:
-            task_config: Task configuration dictionary
+            task_config: Task configuration (TaskModel)
             global_notifier: Global notifier instance
             global_notification_config: Global notification settings (notify_on, include_output)
         """
         self.config = task_config
-        self.name = task_config['name']
-        self.steps = task_config['steps']
-        self.on_failure = task_config.get('on_failure', 'stop')
-        self.retry_count = task_config.get('retry_count', 3)
+        self.name = task_config.name
+        self.steps = task_config.steps
+        self.on_failure = task_config.on_failure
+        self.retry_count = task_config.retry_count
         
         # Use global notification config as defaults
         if global_notification_config is None:
             global_notification_config = {'notify_on': 'all', 'include_output': 'all'}
         
         # Task can override global notification settings
-        self.notify_on = task_config.get('notify_on', global_notification_config.get('notify_on', 'all'))
-        self.include_output = task_config.get('include_output', global_notification_config.get('include_output', 'all'))
+        self.notify_on = task_config.notify_on if task_config.notify_on is not None else global_notification_config.get('notify_on', 'all')
+        self.include_output = task_config.include_output if task_config.include_output is not None else global_notification_config.get('include_output', 'all')
         
         # Setup notifier (task-specific or global)
-        task_apprise_urls = task_config.get('apprise', [])
+        task_apprise_urls = task_config.apprise
         if task_apprise_urls:
             self.notifier = Notifier(task_apprise_urls)
         else:
@@ -72,7 +73,7 @@ class TaskRunner:
         all_output = []
         
         for step_idx, step in enumerate(self.steps):
-            command = step['command']
+            command = step.command
             logger.info(f"Task '{self.name}' - Step {step_idx + 1}/{len(self.steps)}: {command}")
             
             attempt = 0

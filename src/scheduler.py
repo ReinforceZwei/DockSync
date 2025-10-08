@@ -67,7 +67,7 @@ class DockSyncScheduler:
             self.notification_config = loader.get_notification_config()
             
             logger.info(f"Configuration loaded successfully")
-            logger.info(f"Found {len(loader.get_tasks())} task(s)")
+            logger.info(f"Found {len(self.config.tasks)} task(s)")
             
             if global_apprise_urls:
                 logger.info(f"Global Apprise URLs configured: {len(global_apprise_urls)}")
@@ -81,11 +81,12 @@ class DockSyncScheduler:
 
     def schedule_tasks(self):
         """Schedule all tasks from configuration."""
-        tasks = self.config.get('tasks', [])
+        # Use already loaded config
+        tasks = self.config.tasks
         
         for task_config in tasks:
-            task_name = task_config['name']
-            cron_expr = task_config['cron']
+            task_name = task_config.name
+            cron_expr = task_config.cron
             
             try:
                 # Create task runner with global notification config
