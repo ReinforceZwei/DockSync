@@ -1,0 +1,6 @@
+tasks:
+  - name: "minimal-task"
+    cron: "0 0 * * *"
+    steps:
+      - command: "echo 'Minimal task'"
+

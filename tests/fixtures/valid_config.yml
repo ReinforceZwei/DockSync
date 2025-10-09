@@ -1,0 +1,36 @@
+apprise:
+  - "discord://webhook_id/webhook_token"
+  - "telegram://bot_token/chat_id"
+
+notification:
+  notify_on: "all"
+  include_output: "all"
+
+tasks:
+  - name: "test-task-1"
+    cron: "0 2 * * *"
+    notify_on: "all"
+    on_failure: "stop"
+    steps:
+      - command: "echo 'Step 1'"
+      - command: "echo 'Step 2'"
+  
+  - name: "test-task-2"
+    cron: "*/30 * * * *"
+    notify_on: "failure"
+    include_output: "failure"
+    on_failure: "retry"
+    retry_count: 3
+    steps:
+      - command: "rclone sync /data/test remote:test"
+  
+  - name: "test-task-3"
+    cron: "0 0 * * 0"
+    on_failure: "continue"
+    apprise:
+      - "ntfy://ntfy.sh/my_topic"
+    steps:
+      - command: "echo 'Task 3 step 1'"
+      - command: "echo 'Task 3 step 2'"
+      - command: "echo 'Task 3 step 3'"
+

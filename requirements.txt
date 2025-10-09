@@ -4,3 +4,7 @@ croniter==2.0.1
 pydantic==2.10.4
 pydantic-yaml==1.4.0
 
+# Testing dependencies
+pytest>=8.0.0
+pytest-cov>=4.1.0
+pytest-mock>=3.12.0

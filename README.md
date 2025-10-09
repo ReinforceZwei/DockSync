@@ -419,6 +419,24 @@ docker exec docksync rclone sync /data/test remote:test
 - Check remote name in your command matches configured remotes
 - Test rclone commands manually with `docker exec`
 
+## Testing
+
+DockSync includes a comprehensive test suite using pytest. The tests cover configuration loading, model validation, task execution, and notification handling.
+
+### Running Tests
+
+#### Install Test Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+#### Run All Tests
+
+```bash
+pytest
+```
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or pull request.

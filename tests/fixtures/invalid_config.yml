@@ -1,0 +1,13 @@
+apprise:
+  - "discord://webhook_id/webhook_token"
+
+notification:
+  notify_on: "invalid_value"  # Invalid: should be 'all', 'failure', or 'never'
+  include_output: "all"
+
+tasks:
+  - name: "bad-cron-task"
+    cron: "invalid cron expression"  # Invalid cron expression
+    steps:
+      - command: "echo 'test'"
+
